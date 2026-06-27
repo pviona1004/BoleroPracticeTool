@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bolero Rhythm Metronome</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app" aria-label="Bolero rhythm metronome">
+      <section class="stage" aria-label="Practice controls">
+        <div class="brand">
+          <p class="eyebrow">Ravel Practice Tool</p>
+          <h1>Bolero Rhythm</h1>
+        </div>
+
+        <div class="practice-surface">
+          <section class="player-panel" aria-label="Playback">
+            <div class="meter-display" aria-hidden="true">
+              <div class="bar-lines">
+                <span></span>
+                <span></span>
+              </div>
+              <div class="pulse-grid" id="pulseGrid"></div>
+            </div>
+
+            <div class="transport-row">
+              <button class="play-button" id="playButton" type="button" aria-pressed="false">
+                <span class="play-icon" aria-hidden="true"></span>
+                <span id="playLabel">재생</span>
+              </button>
+              <div class="status">
+                <span class="status-light" id="statusLight" aria-hidden="true"></span>
+                <span id="statusText">대기 중</span>
+              </div>
+            </div>
+          </section>
+
+          <aside class="tempo-panel" aria-label="Tempo control">
+            <label class="tempo-label" for="bpmInput">BPM</label>
+            <div class="tempo-readout">
+              <button class="step-button" id="decreaseBpm" type="button" aria-label="BPM 줄이기">−</button>
+              <input id="bpmInput" type="number" min="40" max="220" step="1" value="72" inputmode="numeric" />
+              <button class="step-button" id="increaseBpm" type="button" aria-label="BPM 올리기">+</button>
+            </div>
+            <input id="bpmSlider" class="tempo-slider" type="range" min="40" max="220" step="1" value="72" aria-label="BPM slider" />
+            <div class="tempo-marks" aria-hidden="true">
+              <span>40</span>
+              <span>130</span>
+              <span>220</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
