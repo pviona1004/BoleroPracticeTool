@@ -62,6 +62,7 @@ let isPlaying = false;
 let nextPulseTime = 0;
 let currentPulse = 0;
 let visualTimeouts = [];
+let audioUnlocked = false;
 
 for (let i = 0; i < PATTERN_STEPS; i += 1) {
   const pulse = document.createElement("span");
@@ -95,7 +96,12 @@ function setBpm(value) {
 function ensureAudio() {
   if (audioContext) return;
 
-  audioContext = new AudioContext();
+  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextConstructor) {
+    throw new Error("Web Audio is not supported in this browser.");
+  }
+
+  audioContext = new AudioContextConstructor();
   const sampleCount = audioContext.sampleRate * 0.18;
   noiseBuffer = audioContext.createBuffer(1, sampleCount, audioContext.sampleRate);
   const data = noiseBuffer.getChannelData(0);
@@ -103,6 +109,23 @@ function ensureAudio() {
   for (let i = 0; i < sampleCount; i += 1) {
     data[i] = Math.random() * 2 - 1;
   }
+}
+
+async function unlockAudio() {
+  if (audioUnlocked) return true;
+
+  const silentBuffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
+  const source = audioContext.createBufferSource();
+  source.buffer = silentBuffer;
+  source.connect(audioContext.destination);
+  source.start(0);
+
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
+
+  audioUnlocked = audioContext.state === "running";
+  return audioUnlocked;
 }
 
 function playSnare(time, velocity) {
@@ -166,9 +189,19 @@ function scheduler() {
   }
 }
 
-function start() {
-  ensureAudio();
-  audioContext.resume();
+async function start() {
+  try {
+    ensureAudio();
+    const canPlay = await unlockAudio();
+    if (!canPlay) {
+      statusText.textContent = "소리 허용 필요";
+      return;
+    }
+  } catch (error) {
+    statusText.textContent = "오디오 미지원";
+    return;
+  }
+
   isPlaying = true;
   currentPulse = 0;
   nextPulseTime = audioContext.currentTime + 0.06;
