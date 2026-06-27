@@ -61,6 +61,7 @@ let schedulerId;
 let isPlaying = false;
 let nextPulseTime = 0;
 let currentPulse = 0;
+let visualTimeouts = [];
 
 for (let i = 0; i < PATTERN_STEPS; i += 1) {
   const pulse = document.createElement("span");
@@ -139,17 +140,21 @@ function playSnare(time, velocity) {
 function flashPulse(index, time) {
   const delay = Math.max(0, (time - audioContext.currentTime) * 1000);
 
-  window.setTimeout(() => {
-    pulses.forEach((pulse) => pulse.classList.remove("active"));
-    pulses[index].classList.add("active");
+  const timeoutId = window.setTimeout(() => {
+    window.requestAnimationFrame(() => {
+      pulses.forEach((pulse) => pulse.classList.remove("active"));
+      pulses[index].classList.add("active");
+    });
   }, delay);
+
+  visualTimeouts.push(timeoutId);
 }
 
 function schedulePulse(index, time) {
-  if (hits.has(index)) {
-    playSnare(time, hits.get(index));
-  }
+  const velocity = hits.get(index);
+  if (!velocity) return;
 
+  playSnare(time, velocity);
   flashPulse(index, time);
 }
 
@@ -181,6 +186,8 @@ function stop() {
   isPlaying = false;
   window.clearInterval(schedulerId);
   schedulerId = undefined;
+  visualTimeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
+  visualTimeouts = [];
   pulses.forEach((pulse) => pulse.classList.remove("active"));
 
   playButton.classList.remove("is-playing");

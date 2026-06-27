@@ -172,10 +172,10 @@ h1 {
   background: rgba(247, 241, 232, 0.08);
   transform: scale(0.78);
   transition:
-    transform 80ms ease,
-    background 80ms ease,
-    border-color 80ms ease,
-    box-shadow 80ms ease;
+    transform 35ms ease,
+    background 35ms ease,
+    border-color 35ms ease,
+    box-shadow 35ms ease;
 }
 
 .pulse.hit {
